@@ -1,71 +1,98 @@
-# Full-Stack Betting Platform with 13-Role RBAC
+# 13-Role RBAC Betting System
 
-Production-ready betting platform with comprehensive role-based access control system, modern React frontend, NestJS backend, and PostgreSQL database.
+A production-ready full-stack betting platform with comprehensive role-based access control.
 
-## 🎯 Features
+## 📁 Project Structure
 
-- ✅ **13-Role Hierarchical RBAC**: Owner, Mother, Whitelabel, Superadmin, Admin, B2C/B2B Subadmin, Affiliates, Agents, and Users
-- ✅ **Full-Stack Architecture**: React + NestJS + PostgreSQL
-- ✅ **Role-Based Dashboards**: Separate UIs for Users, Agents, and Admins
-- ✅ **Multi-Language Support**: English and Bengali (বাংলা)
-- ✅ **Modern Dark Theme**: Premium UI with smooth animations
-- ✅ **JWT Authentication**: Secure token-based auth
-- ✅ **Wallet System**: Deposit, withdraw, balance management
-- ✅ **Commission System**: Multi-level commission distribution
-- ✅ **Downline Management**: Hierarchical user tree visualization
-- ✅ **Docker Ready**: Full containerization support
-
-## 📋 Supported Roles
-
-| Role | Access Level | Description |
-|------|-------------|-------------|
-| OWNER | 1 | Platform owner with complete control |
-| MOTHER | 2 | Mother account with broad oversight |
-| WHITELABEL | 3 | White label operator |
-| SUPERADMIN | 4 | Super administrator |
-| ADMIN | 5 | Administrator |
-| B2C_SUBADMIN | 6 | B2C sub-administrator |
-| B2B_SUBADMIN | 7 | B2B sub-administrator |
-| SENIOR_AFFILIATE | 8 | Senior affiliate marketer |
-| AFFILIATE | 9 | Affiliate marketer |
-| SUPER_AGENT | 10 | Super agent |
-| MASTER_AGENT | 11 | Master agent |
-| AGENT | 12 | Agent |
-| USER | 13 | End user (player) |
-
-See [docs/ROLES.md](./docs/ROLES.md) for detailed role permissions.
+```
+betting_all_in_one/
+├── client/          # React Frontend (Vite)
+├── server/          # NestJS Backend API
+├── docs/            # Documentation
+└── .github/         # GitHub workflows
+```
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Local Development
 
-- Node.js 18+
-docker-compose up -d
-```
-
-This will spin up:
-- Postgres (DB)
-- Redis (Cache/Queue)
-- Backend API (http://localhost:3000)
-- Admin Dashboard (http://localhost:3001)
-
-### Development
-To run services individually:
-
+**Backend:**
 ```bash
-# Backend
-cd apps/backend
+cd server
+npm install
 npm run start:dev
-
-# Admin
-cd apps/admin
-npm run dev
-
-# Mobile
-cd apps/mobile
-flutter run
 ```
 
-## Documentation
-- [OpenAPI Spec](./openapi.yaml)
-- [ADRs](./docs/adr)
+**Frontend:**
+```bash
+cd client
+npm install
+npm run dev
+```
+
+**Database:** PostgreSQL (Docker or local)
+
+### Vercel Deployment
+
+See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for complete deployment guide.
+
+## 🔐 13-Role Hierarchy
+
+```
+OWNER → MOTHER → WHITELABEL → SUPERADMIN → ADMIN → 
+B2C_SUBADMIN → B2B_SUBADMIN → SENIOR_AFFILIATE → AFFILIATE → 
+SUPER_AGENT → MASTER_AGENT → AGENT → USER
+```
+
+## 📚 Documentation
+
+- [Vercel Deployment Guide](./VERCEL_DEPLOYMENT.md)
+- [Role System Documentation](./docs/ROLES.md)
+- [Quick Start Guide](./QUICK_START.md)
+- [Verification Guide](./VERIFICATION.md)
+
+## 🧪 Test Accounts
+
+All accounts use password: `password123`
+
+- `owner` - Highest privilege
+- `admin` - Administrator
+- `agent` - Agent level
+- `testuser` - Regular user
+
+## 🛠️ Tech Stack
+
+**Frontend:**
+- React + Vite
+- React Router
+- Axios
+- i18next (EN/BN)
+
+**Backend:**
+- NestJS
+- Prisma ORM
+- PostgreSQL
+- JWT Authentication
+
+## 📦 Features
+
+- ✅ 13-role hierarchical RBAC
+- ✅ Role-based dashboard routing
+- ✅ User/Agent/Admin management
+- ✅ Match market management
+- ✅ General settings
+- ✅ Multi-language support
+- ✅ Responsive dark theme UI
+
+## 🌐 Live Demo
+
+- Frontend: [Deploy on Vercel]
+- Backend: [Deploy on Vercel]
+
+## 📄 License
+
+See [LICENSE](./LICENSE) file.
+
+## 🤝 Contributing
+
+This is a production system. Contact repository owner for contributions.

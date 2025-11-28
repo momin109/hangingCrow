@@ -1,2 +1,0 @@
-src/auth/auth.module.ts(4,27): error TS2307: Cannot find module '@nestjs/jwt' or its corresponding type declarations.
-src/auth/auth.service.ts(3,28): error TS2307: Cannot find module '@nestjs/jwt' or its corresponding type declarations.
