@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  MOTHER
+  WHITELABEL
+  SUPERADMIN
+  ADMIN
+  B2C_SUBADMIN
+  B2B_SUBADMIN
+  SENIOR_AFFILIATE
+  AFFILIATE
+  SUPER_AGENT
+  MASTER_AGENT
+  AGENT
+  USER
+}
+
+enum CommissionType {
+  DEPOSIT
+  TURNOVER
+  WEEKLY_LOSS
+  REFERRAL
+  REGULAR_DEPOSIT
+}
+
+model Tenant {
+  id        String    @id @default(uuid())
+  name      String
+  domain    String    @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  users     User[]
+}
+
+model User {
+  id        String           @id @default(uuid())
+  tenantId  String           @map("tenant_id")
+  tenant    Tenant           @relation(fields: [tenantId], references: [id])
+  username  String           @unique
+  password  String
+  role      Role
+  parentId  String?          @map("parent_id")
+  parent    User?            @relation("UserHierarchy", fields: [parentId], references: [id])
+  children  User[]           @relation("UserHierarchy")
+  wallet    Wallet?
+  kyc       KycVerification?
+  bets      Bet[]
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+  deletedAt DateTime?        @map("deleted_at")
+  createdBy String?          @map("created_by")
+
+  @@index([tenantId])
+}
+
+model Wallet {
+  id                String   @id @default(uuid())
+  userId            String   @unique @map("user_id")
+  user              User     @relation(fields: [userId], references: [id])
+  balance           Decimal  @default(0) @db.Decimal(19, 4)
+  commissionBalance Decimal  @default(0) @map("commission_balance") @db.Decimal(19, 4)
+  currency          String   @default("BDT")
+  version           Int      @default(0) // Optimistic locking
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+}
+
+model KycVerification {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  user        User     @relation(fields: [userId], references: [id])
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, MANUAL_REVIEW
+  riskScore   Int      @default(0) @map("risk_score")
+  providerRef String?  @map("provider_ref")
+  data        Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+}
+
+model Bet {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  user         User      @relation(fields: [userId], references: [id])
+  marketId     String    @map("market_id")
+  selectionId  String    @map("selection_id")
+  odds         Decimal   @db.Decimal(19, 4)
+  stake        Decimal   @db.Decimal(19, 4)
+  status       String    @default("PENDING") // PENDING, WON, LOST, VOID, HALF_WON, HALF_LOST
+  potentialWin Decimal   @map("potential_win") @db.Decimal(19, 4)
+  placedAt     DateTime  @default(now()) @map("placed_at")
+  settledAt    DateTime? @map("settled_at")
+  tenantId     String    @map("tenant_id")
+
+  // Partitioning by month would be handled at DB level, Prisma doesn't fully support declarative partitioning DDL yet
+  // but we design for it.
+
+  @@index([userId])
+  @@index([status])
+}
+
+model BetSettle {
+  id        String   @id @default(uuid())
+  betId     String   @map("bet_id")
+  amount    Decimal  @db.Decimal(19, 4) // Positive for win, 0 for loss, negative for rollback
+  type      String // WIN, VOID, ROLLBACK
+  createdAt DateTime @default(now()) @map("created_at")
+}
+
+model CommissionTxn {
+  id           String         @id @default(uuid())
+  userId       String         @map("user_id") // Who received the commission
+  sourceUserId String         @map("source_user_id") // Who generated the commission (the bettor)
+  amount       Decimal        @db.Decimal(19, 4)
+  type         CommissionType
+  level        Int // Hierarchy level distance
+  createdAt    DateTime       @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model CommissionConfig {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id") // Config owner (B2C_SUBADMIN)
+  config    Json // JSONB config for rates
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}

@@ -1,28 +1,10 @@
 {
-  "name": "betting-system-monorepo",
-  "version": "0.0.1",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "name": "betting-system",
+  "version": "1.0.0",
+  "description": "13-role RBAC betting system",
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "clean": "turbo run clean && rm -rf node_modules"
-  },
-  "devDependencies": {
-    "turbo": "^1.10.0",
-    "prettier": "^3.0.0",
-    "eslint": "^8.48.0",
-    "typescript": "^5.2.2"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  },
-  "packageManager": "npm@9.6.7"
+    "client": "cd client && npm run dev",
+    "server": "cd server && npm run start:dev",
+    "install:all": "cd client && npm install && cd ../server && npm install"
+  }
 }
