@@ -1,17 +1,29 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common';
+import express from 'express';
 
-// Vercel serverless handler
-export default async function handler(req: any, res: any) {
-    const app = await NestFactory.create(AppModule);
-    
-    app.enableCors();
-    app.setGlobalPrefix('api');
-    app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-    
-    await app.init();
-    
-    const server = app.getHttpAdapter().getInstance();
+const server = express();
+let app;
+
+async function bootstrap() {
+    if (!app) {
+        app = await NestFactory.create(
+            AppModule,
+            new ExpressAdapter(server),
+        );
+        
+        app.enableCors();
+        app.setGlobalPrefix('api');
+        app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+        
+        await app.init();
+    }
+    return app;
+}
+
+export default async function handler(req, res) {
+    await bootstrap();
     return server(req, res);
 }
