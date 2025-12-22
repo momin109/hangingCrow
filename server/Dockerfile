@@ -29,4 +29,4 @@ COPY --from=development /usr/src/app/dist ./dist
 COPY --from=development /usr/src/app/prisma ./prisma
 COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
-CMD ["node", "dist/main"]
+CMD ["node", "dist/src/main"]
