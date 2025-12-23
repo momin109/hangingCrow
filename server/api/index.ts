@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../src/app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from 'server/node_modules/@nestjs/core';
+import { AppModule } from 'server/src/app.module';
+import { ValidationPipe } from 'server/node_modules/@nestjs/common';
 import serverlessExpress from '@codegenie/serverless-express';
 
 let cachedServer;

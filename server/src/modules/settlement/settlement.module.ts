@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { SettlementService } from './settlement.service';
-import { PrismaModule } from '../../prisma/prisma.module';
+import { SettlementService } from 'src/modules/settlement/settlement.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
 import { BullModule } from '@nestjs/bull';
 
 @Module({

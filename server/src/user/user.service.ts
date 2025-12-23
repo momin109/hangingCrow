@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Role } from '@prisma/client';
-import { isRoleAtLeast } from '../auth/guards/roles.guard';
-import * as bcrypt from 'bcrypt';
+import { isRoleAtLeast } from 'src/auth/guards/roles.guard';
+import * as bcrypt from '@types/bcrypt';
 
 @Injectable()
 export class UserService {

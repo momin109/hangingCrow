@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SettlementProcessor } from './settlement.processor';
-import { SettlementService } from '../settlement/settlement.service';
-import { PrismaModule } from '../../prisma/prisma.module';
-import { CommissionModule } from '../../commission/commission.module';
+import { SettlementProcessor } from 'src/modules/queue/settlement.processor';
+import { SettlementService } from 'src/modules/settlement/settlement.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
+import { CommissionModule } from 'src/commission/commission.module';
 
 @Module({
     imports: [

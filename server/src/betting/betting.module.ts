@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { BettingController } from './betting.controller';
-import { BettingService } from './betting.service';
-import { PrismaModule } from '../prisma/prisma.module';
-import { CommissionModule } from '../commission/commission.module';
+import { BettingController } from 'src/betting/betting.controller';
+import { BettingService } from 'src/betting/betting.service';
+import { PrismaModule } from 'src/prisma/prisma.module';
+import { CommissionModule } from 'src/commission/commission.module';
 
 @Module({
     imports: [PrismaModule, CommissionModule],

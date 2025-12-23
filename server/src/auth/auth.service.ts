@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { RegisterDto, LoginDto } from './dto'; // Assuming DTOs will be created
+import * as bcrypt from '@types/bcrypt';
+import { RegisterDto, LoginDto } from 'src/auth/dto'; // Assuming DTOs will be created
 import { Role } from '@prisma/client';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Processor, Process } from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bull';
-import { SettlementService } from '../settlement/settlement.service';
+import { SettlementService } from 'src/modules/settlement/settlement.service';
 
 /**
  * Settlement Queue Processor

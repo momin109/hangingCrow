@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { KycService } from './kyc.service';
+import { KycService } from 'src/kyc/kyc.service';
 
 @Controller('kyc')
 export class KycController {

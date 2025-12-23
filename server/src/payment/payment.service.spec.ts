@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PaymentService } from './payment.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PaymentService } from 'src/payment/payment.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { BadRequestException } from '@nestjs/common';
 
 describe('PaymentService', () => {

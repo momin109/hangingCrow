@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BettingService } from './betting.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { CommissionService } from '../commission/commission.service';
+import { BettingService } from 'src/betting/betting.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CommissionService } from 'src/commission/commission.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('BettingService', () => {

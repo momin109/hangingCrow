@@ -1,5 +1,5 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from '@types/express';
 import { ThrottlerException } from '@nestjs/throttler';
 
 /**

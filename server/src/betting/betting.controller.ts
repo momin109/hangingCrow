@@ -1,7 +1,7 @@
 import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
-import { BettingService } from './betting.service';
-import { PlaceBetDto } from './dto/place-bet.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { BettingService } from 'src/betting/betting.service';
+import { PlaceBetDto } from 'src/betting/dto/place-bet.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('betting')
 @UseGuards(JwtAuthGuard)

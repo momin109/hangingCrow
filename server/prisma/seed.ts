@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'server/node_modules/@types/bcrypt';
 
 const prisma = new PrismaClient();
 

@@ -43,26 +43,34 @@ model Tenant {
 }
 
 model User {
-  id        String           @id @default(uuid())
-  tenantId  String           @map("tenant_id")
-  tenant    Tenant           @relation(fields: [tenantId], references: [id])
-  username  String           @unique
-  password  String
-  role      Role
-  parentId  String?          @map("parent_id")
-  parent    User?            @relation("UserParent", fields: [parentId], references: [id])
-  children  User[]           @relation("UserParent")
-  ancestors UserHierarchy[]  @relation("UserHierarchyDescendant")
-  descendants UserHierarchy[] @relation("UserHierarchyAncestor")
-  wallet    Wallet?
-  kyc       KycVerification?
-  bets      Bet[]
-  createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime         @updatedAt @map("updated_at")
-  deletedAt DateTime?        @map("deleted_at")
-  createdBy String?          @map("created_by")
+  id           String           @id @default(uuid())
+  tenantId     String           @map("tenant_id")
+  tenant       Tenant           @relation(fields: [tenantId], references: [id])
+  username     String           @unique
+  password     String
+  role         Role
+  parentId     String?          @map("parent_id")
+  parent       User?            @relation("UserParent", fields: [parentId], references: [id])
+  children     User[]           @relation("UserParent")
+  ancestors    UserHierarchy[]  @relation("UserHierarchyDescendant")
+  descendants  UserHierarchy[]  @relation("UserHierarchyAncestor")
+  wallet       Wallet?
+  kyc          KycVerification?
+  bets         Bet[]
+  
+  // Lock system for anti-cheat cascade
+  isLocked     Boolean          @default(false) @map("is_locked")
+  lockedAt     DateTime?        @map("locked_at")
+  lockedReason String?          @map("locked_reason")
+  lockedBy     String?          @map("locked_by")
+  
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  deletedAt    DateTime?        @map("deleted_at")
+  createdBy    String?          @map("created_by")
 
   @@index([tenantId])
+  @@index([isLocked])
 }
 
 model UserHierarchy {
@@ -83,6 +91,7 @@ model Wallet {
   userId            String   @unique @map("user_id")
   user              User     @relation(fields: [userId], references: [id])
   balance           Decimal  @default(0) @db.Decimal(19, 4)
+  lockedBalance     Decimal  @default(0) @map("locked_balance") @db.Decimal(19, 4)
   commissionBalance Decimal  @default(0) @map("commission_balance") @db.Decimal(19, 4)
   currency          String   @default("BDT")
   version           Int      @default(0) // Optimistic locking
@@ -268,4 +277,38 @@ model RiskReport {
   @@index([userId])
   @@index([score])
   @@index([createdAt])
+}
+
+// Immutable audit log for all critical actions
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  action      String   // LOGIN, BET_PLACE, BET_SETTLE, LOCK, UNLOCK, WALLET_UPDATE, etc.
+  targetId    String?  @map("target_id")
+  targetType  String?  @map("target_type") // USER, BET, WALLET, etc.
+  ipAddress   String?  @map("ip_address")
+  deviceHash  String?  @map("device_hash")
+  meta        Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([targetId])
+}
+
+// Frozen odds snapshot for bet validation - prevents odds manipulation
+model OddsSnapshot {
+  id        String   @id @default(uuid())
+  marketId  String   @map("market_id")
+  fancyId   Int?     @map("fancy_id")
+  odds      Json     // Frozen odds data at snapshot time
+  hash      String   // SHA256 hash for validation
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([marketId])
+  @@index([fancyId])
+  @@index([expiresAt])
+  @@index([hash])
 }
