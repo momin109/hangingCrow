@@ -9,7 +9,10 @@ async function bootstrap() {
     if (!cachedServer) {
         const app = await NestFactory.create(AppModule);
 
-        app.enableCors();
+        app.enableCors({
+            origin: process.env.FRONTEND_URL?.split(',') || '*',
+            credentials: true,
+        });
         app.setGlobalPrefix('api');
         app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 

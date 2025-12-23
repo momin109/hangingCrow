@@ -10,6 +10,12 @@ export class BettingController {
 
     @Post('place')
     placeBet(@Request() req, @Body() dto: PlaceBetDto) {
-        return this.bettingService.placeBet(req.user.id, req.user.tenantId, dto);
+        return this.bettingService.placeBet({
+            userId: req.user.id,
+            marketId: dto.marketId,
+            selectionId: dto.selectionId,
+            odds: dto.odds,
+            stake: dto.stake,
+        });
     }
 }

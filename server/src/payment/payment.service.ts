@@ -1,42 +1,115 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+/**
+ * Payment Service - Handles deposits and withdrawals with atomic transactions
+ */
 @Injectable()
 export class PaymentService {
+    private readonly logger = new Logger(PaymentService.name);
+
     constructor(private prisma: PrismaService) { }
 
-    async initiateDeposit(userId: string, amount: number, provider: string) {
-        // 1. Create pending transaction record (omitted for brevity, would be in a PaymentTxn model)
-        // 2. Call provider API to get payment URL
+    /**
+     * Deposit money into user wallet
+     */
+    async deposit(userId: string, amount: number) {
+        this.logger.log(`Depositing ${amount} to user ${userId}`);
 
-        // Mock response
-        return {
-            paymentUrl: `https://sandbox.${provider}.com/pay?amount=${amount}&ref=${userId}`,
-            trxId: 'MOCK_TRX_' + Date.now(),
-        };
-    }
-
-    async handleWebhook(provider: string, payload: any) {
-        // 1. Verify signature
-        // 2. Find transaction
-        // 3. Update transaction status
-        // 4. Credit user wallet if success
-
-        if (payload.status === 'SUCCESS') {
-            const userId = payload.ref; // Assuming ref is userId for simplicity
-            const amount = parseFloat(payload.amount);
-
-            await this.prisma.$transaction(async (tx) => {
-                await tx.wallet.update({
-                    where: { userId },
-                    data: {
-                        balance: { increment: amount },
-                        version: { increment: 1 },
-                    },
-                });
-            });
+        if (amount <= 0) {
+            throw new BadRequestException('Amount must be positive');
         }
 
-        return { status: 'ok' };
+        return await this.prisma.$transaction(async (tx) => {
+            const wallet = await tx.wallet.findUnique({
+                where: { userId },
+            });
+
+            if (!wallet) {
+                throw new BadRequestException('Wallet not found');
+            }
+
+            // Update wallet with optimistic locking
+            const updatedWallet = await tx.wallet.update({
+                where: {
+                    userId,
+                    version: wallet.version
+                },
+                data: {
+                    balance: {
+                        increment: amount,
+                    },
+                    version: {
+                        increment: 1,
+                    },
+                },
+            });
+
+            this.logger.log(`Deposit successful: ${amount} to ${userId}`);
+            return updatedWallet;
+        });
+    }
+
+    /**
+     * Withdraw money from user wallet
+     */
+    async withdraw(userId: string, amount: number) {
+        this.logger.log(`Withdrawing ${amount} from user ${userId}`);
+
+        if (amount <= 0) {
+            throw new BadRequestException('Amount must be positive');
+        }
+
+        return await this.prisma.$transaction(async (tx) => {
+            const wallet = await tx.wallet.findUnique({
+                where: { userId },
+            });
+
+            if (!wallet) {
+                throw new BadRequestException('Wallet not found');
+            }
+
+            if (Number(wallet.balance) < amount) {
+                throw new BadRequestException('Insufficient balance');
+            }
+
+            // Update wallet with optimistic locking
+            const updatedWallet = await tx.wallet.update({
+                where: {
+                    userId,
+                    version: wallet.version
+                },
+                data: {
+                    balance: {
+                        decrement: amount,
+                    },
+                    version: {
+                        increment: 1,
+                    },
+                },
+            });
+
+            this.logger.log(`Withdrawal successful: ${amount} from ${userId}`);
+            return updatedWallet;
+        });
+    }
+
+    /**
+     * Get user wallet balance
+     */
+    async getBalance(userId: string) {
+        const wallet = await this.prisma.wallet.findUnique({
+            where: { userId },
+        });
+
+        if (!wallet) {
+            throw new BadRequestException('Wallet not found');
+        }
+
+        return {
+            balance: Number(wallet.balance),
+            commissionBalance: Number(wallet.commissionBalance),
+            currency: wallet.currency,
+        };
     }
 }

@@ -5,6 +5,8 @@ build
 .next
 .env
 .env.local
+.env.temp
 .DS_Store
 coverage
 *.log
+error.txt

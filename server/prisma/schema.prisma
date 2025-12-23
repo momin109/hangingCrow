@@ -50,8 +50,10 @@ model User {
   password  String
   role      Role
   parentId  String?          @map("parent_id")
-  parent    User?            @relation("UserHierarchy", fields: [parentId], references: [id])
-  children  User[]           @relation("UserHierarchy")
+  parent    User?            @relation("UserParent", fields: [parentId], references: [id])
+  children  User[]           @relation("UserParent")
+  ancestors UserHierarchy[]  @relation("UserHierarchyDescendant")
+  descendants UserHierarchy[] @relation("UserHierarchyAncestor")
   wallet    Wallet?
   kyc       KycVerification?
   bets      Bet[]
@@ -61,6 +63,19 @@ model User {
   createdBy String?          @map("created_by")
 
   @@index([tenantId])
+}
+
+model UserHierarchy {
+  ancestorId   String @map("ancestor_id")
+  descendantId String @map("descendant_id")
+  depth        Int
+
+  ancestor   User @relation("UserHierarchyAncestor", fields: [ancestorId], references: [id])
+  descendant User @relation("UserHierarchyDescendant", fields: [descendantId], references: [id])
+
+  @@id([ancestorId, descendantId])
+  @@index([ancestorId])
+  @@index([descendantId])
 }
 
 model Wallet {
@@ -91,8 +106,17 @@ model Bet {
   id           String    @id @default(uuid())
   userId       String    @map("user_id")
   user         User      @relation(fields: [userId], references: [id])
+  
+  // Legacy market ID (String) - keep for backward compatibility
   marketId     String    @map("market_id")
   selectionId  String    @map("selection_id")
+  
+  // New relations to Match/Market/Fancy system
+  newMarketId  Int?      @map("new_market_id")
+  newMarket    Market?   @relation("MarketBets", fields: [newMarketId], references: [id])
+  fancyId      Int?      @map("fancy_id")
+  fancy        Fancy?    @relation("FancyBets", fields: [fancyId], references: [id])
+  
   odds         Decimal   @db.Decimal(19, 4)
   stake        Decimal   @db.Decimal(19, 4)
   status       String    @default("PENDING") // PENDING, WON, LOST, VOID, HALF_WON, HALF_LOST
@@ -100,12 +124,15 @@ model Bet {
   placedAt     DateTime  @default(now()) @map("placed_at")
   settledAt    DateTime? @map("settled_at")
   tenantId     String    @map("tenant_id")
+  meta         Json? // Additional bet metadata
 
   // Partitioning by month would be handled at DB level, Prisma doesn't fully support declarative partitioning DDL yet
   // but we design for it.
 
   @@index([userId])
   @@index([status])
+  @@index([newMarketId])
+  @@index([fancyId])
 }
 
 model BetSettle {
@@ -135,4 +162,110 @@ model CommissionConfig {
   config    Json // JSONB config for rates
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+// Sports Betting Models
+
+model Match {
+  id              Int       @id @default(autoincrement())
+  providerMatchId String?   @map("provider_match_id") // External provider ID
+  sport           String // cricket, football, tennis, etc.
+  title           String // Match title/name
+  startTime       DateTime  @map("start_time")
+  status          String    @default("scheduled") // scheduled, live, completed, cancelled
+  meta            Json? // Additional metadata
+  markets         Market[]
+  fancies         Fancy[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([startTime])
+}
+
+model Market {
+  id        Int      @id @default(autoincrement())
+  matchId   Int      @map("match_id")
+  marketKey String   @map("market_key") // match_odds, bookmaker, etc.
+  name      String // Market name/description
+  status    String   @default("open") // open, suspended, closed
+  odds      Json? // Current odds data
+  meta      Json? // Additional metadata
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  bets      Bet[]    @relation("MarketBets")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([matchId])
+  @@index([status])
+}
+
+model Fancy {
+  id        Int      @id @default(autoincrement())
+  matchId   Int      @map("match_id")
+  name      String // Fancy name
+  rate      Decimal  @db.Decimal(19, 4) // Current rate
+  status    String   @default("open") // open, suspended, closed
+  meta      Json? // Additional metadata
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  bets      Bet[]    @relation("FancyBets")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([matchId])
+  @@index([status])
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String // deposit, withdraw
+  amount    Decimal  @db.Decimal(19, 4)
+  method    String // upi, bank, card, crypto
+  status    String   @default("pending") // pending, approved, rejected, processing
+  meta      Json? // Transaction details, reference numbers
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([status])
+}
+
+model CommissionLedger {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  amount    Decimal  @db.Decimal(19, 4)
+  type      String // turnover, deposit, referral
+  meta      Json? // Source details, bet ID, etc.
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Result {
+  id          String    @id @default(uuid())
+  matchId     Int       @map("match_id")
+  marketId    Int?      @map("market_id")
+  resultData  Json      @map("result_data") // Winner, scores, etc.
+  declaredBy  String?   @map("declared_by") // Admin user ID
+  declaredAt  DateTime? @map("declared_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([matchId])
+  @@index([marketId])
+}
+
+model RiskReport {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  betId     String?  @map("bet_id")
+  reason    String // Description of risk flag
+  score     Int // Risk score (0-100)
+  meta      Json? // Additional context
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([score])
+  @@index([createdAt])
 }

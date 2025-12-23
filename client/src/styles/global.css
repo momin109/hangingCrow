@@ -1,0 +1,492 @@
+/* ================================================================ */
+/* VEIKI BETTING PLATFORM - GLOBAL DESIGN SYSTEM                    */
+/* Complete CSS Variables, Animations, and Responsive Design        */
+/* ================================================================ */
+
+/* === GOOGLE FONTS IMPORT === */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap');
+
+:root {
+    /* --- COLOR PALETTE --- */
+    --color-primary: #FF007F;        /* Main Pink Accent */
+    --color-primary-hover: #FF339F;  /* Pink Hover State */
+    --color-primary-light: rgba(255, 0, 127, 0.1);
+    --color-secondary: #00ff00;      /* Hover/Success Green */
+    --color-secondary-hover: #33ff33;
+    --color-accent-cyan: #00D9FF;    /* Cyan Accent */
+    
+    --color-background-dark: #121212;
+    --color-background-deep: #0a0a0a; /* Footer/Deep BG */
+    --color-background-surface: #1A1A1A; /* Card Background */
+    --color-background-hover: #252525;
+    
+    --color-text-light: #ffffff;
+    --color-text-secondary: #CCCCCC;
+    --color-text-subtle: #999999;
+    --color-text-disabled: #666666;
+    
+    --color-border-dark: #333333;
+    --color-border-hover: #444444;
+    --color-divider: #222222;
+    
+    --color-error: #ff3333;
+    --color-error-bg: rgba(255, 51, 51, 0.1);
+    --color-success: #00FF88;
+    --color-success-bg: rgba(0, 255, 136, 0.1);
+    --color-warning: #FFB800;
+    --color-warning-bg: rgba(255, 184, 0, 0.1);
+    --color-info: #00D9FF;
+    --color-info-bg: rgba(0, 217, 255, 0.1);
+
+    /* --- TYPOGRAPHY --- */
+    --font-family-rubik: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-size-xs: 12px;
+    --font-size-sm: 13px;
+    --font-size-body: 14px;
+    --font-size-title-sm: 16px;
+    --font-size-title-md: 20px;
+    --font-size-title-lg: 24px;
+    --font-size-title-xl: 30px;
+    
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* --- SPACING & LAYOUT (8px Grid System) --- */
+    --spacing-unit: 8px;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+
+    /* --- BORDER RADIUS --- */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+
+    /* --- SHADOWS --- */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 20px rgba(255, 0, 127, 0.5);
+    --shadow-glow-strong: 0 0 30px rgba(255, 0, 127, 0.7);
+
+    /* --- TRANSITIONS --- */
+    --transition-speed-fast: 0.15s;
+    --transition-speed-normal: 0.3s;
+    --transition-speed-slow: 0.5s;
+    --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* --- Z-INDEX LAYERS --- */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* === GLOBAL RESET === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* === BODY === */
+body {
+    background: var(--color-background-dark);
+    color: var(--color-text-light);
+    font-family: var(--font-family-rubik);
+    font-size: var(--font-size-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* === ACCESSIBILITY - FOCUS INDICATORS === */
+*:focus {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
+}
+
+/* === ANIMATIONS === */
+@keyframes pulse-green {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(0, 255, 0, 0);
+    }
+}
+
+@keyframes pulse-pink {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 127, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(255, 0, 127, 0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromBottom {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* === UTILITY CLASSES === */
+
+/* Loading States */
+.is-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.is-loading::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* Error States */
+.is-error,
+.has-error {
+    border: 1px solid var(--color-error) !important;
+}
+
+.error-message {
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-xs);
+}
+
+/* Success States */
+.is-success {
+    border: 1px solid var(--color-success) !important;
+}
+
+.success-message {
+    color: var(--color-success);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-xs);
+}
+
+/* Active Betting Pulse */
+.active-betting {
+    border: 2px solid var(--color-secondary);
+    animation: pulse-green 2s infinite;
+}
+
+/* Hover Effects */
+.hover-scale {
+    transition: transform var(--transition-speed-normal) var(--transition-ease);
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+.hover-glow {
+    transition: box-shadow var(--transition-speed-normal) var(--transition-ease);
+}
+
+.hover-glow:hover {
+    box-shadow: var(--shadow-glow);
+}
+
+/* Modal/Overlay */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: var(--z-modal-backdrop);
+    animation: fadeIn var(--transition-speed-normal);
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--color-background-surface);
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-lg);
+    z-index: var(--z-modal);
+    animation: fadeIn var(--transition-speed-normal);
+    max-width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: var(--spacing-md);
+    right: var(--spacing-md);
+    background: var(--color-background-surface);
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    z-index: var(--z-tooltip);
+    animation: slideInFromTop var(--transition-speed-normal);
+    box-shadow: var(--shadow-lg);
+}
+
+.notification.success {
+    border-left: 4px solid var(--color-success);
+}
+
+.notification.error {
+    border-left: 4px solid var(--color-error);
+}
+
+.notification.warning {
+    border-left: 4px solid var(--color-warning);
+}
+
+/* === RESPONSIVE BREAKPOINTS === */
+
+/* Mobile styles (default) */
+@media (max-width: 767px) {
+    :root {
+        --font-size-body: 13px;
+        --font-size-title-sm: 14px;
+        --font-size-title-md: 18px;
+    }
+
+    body {
+        font-size: 13px;
+    }
+
+    /* Hide desktop sidebar, show hamburger */
+    .desktop-sidebar {
+        display: none;
+    }
+
+    .mobile-navigation {
+        display: flex;
+    }
+
+    .hamburger-menu {
+        display: block;
+    }
+
+    /* Stack cards in single column */
+    .card-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Bottom navigation for mobile */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--color-background-surface);
+        border-top: 1px solid var(--color-border-dark);
+        display: flex;
+        justify-content: space-around;
+        padding: var(--spacing-sm);
+        z-index: var(--z-sticky);
+    }
+}
+
+/* Tablet styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sidebar {
+        width: 200px;
+        transition: width var(--transition-speed-normal);
+    }
+
+    .sidebar.collapsed {
+        width: 60px;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .bottom-nav {
+        display: none;
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 1024px) {
+    .sidebar {
+        width: 250px;
+    }
+
+    .mobile-navigation,
+    .hamburger-menu,
+    .bottom-nav {
+        display: none;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* === WCAG ACCESSIBILITY === */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --color-background-dark: #000000;
+        --color-text-light: #FFFFFF;
+        --color-border-dark: #FFFFFF;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* === PRINT STYLES === */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* === PERFORMANCE OPTIMIZATION === */
+
+/* Contain layout shifts */
+.layout-container {
+    min-height: 100vh;
+    contain: layout style paint;
+}
+
+/* Reserve space for images */
+img,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+.image-placeholder {
+    background: var(--color-background-hover);
+    aspect-ratio: 16/9;
+}
+
+/* Skeleton loaders */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--color-background-surface) 25%,
+        var(--color-background-hover) 50%,
+        var(--color-background-surface) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+.skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+}
+
+.skeleton-heading {
+    height: 2em;
+    width: 60%;
+    margin-bottom: 1em;
+}
+
+.skeleton-button {
+    height: 40px;
+    width: 120px;
+    border-radius: var(--radius-md);
+}
