@@ -1,9 +1,4 @@
 # Logs
-frontend/.next/
-frontend/node_modules/
-server/dist/
-*.tsbuildinfo
-
 logs
 *.log
 npm-debug.log*
@@ -12,15 +7,21 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+dist/
+dist-ssr/
+
+# Local env/files
 *.local
 
-# Editor directories and files
+# Editor / OS files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*

@@ -45,19 +45,26 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { roleMenus } from "@/lib/roleMenu";
 
 const pathMap = {
   Dashboard: "/dashboard",
   Users: "/users",
+  "Downline List": "/downline",
+  "My Account": "/account",
+  Banking: "/banking",
   Payments: "/payments",
+  Payment: "/payments",
   Risk: "/risk",
+  "Risk Management": "/risk",
   Result: "/result",
 };
 
 export default function Sidebar() {
   const { user } = useAuth();
+  const pathname = usePathname();
   const menus = roleMenus[user?.role] || [];
 
   return (
@@ -71,16 +78,39 @@ export default function Sidebar() {
 
       <nav className="p-4">
         <ul className="space-y-2">
-          {menus.map((item) => (
-            <li key={item}>
-              <Link
-                href={pathMap[item] || "#"}
-                className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-200 hover:bg-slate-800 hover:text-white transition"
-              >
-                {item}
-              </Link>
-            </li>
-          ))}
+          {menus.map((item) => {
+            const href = pathMap[item];
+
+            if (!href) {
+              return (
+                <li
+                  key={item}
+                  className="px-4 py-3 rounded-xl text-sm font-medium text-slate-500 bg-slate-800/40 cursor-not-allowed"
+                  title="Coming soon"
+                >
+                  {item}
+                </li>
+              );
+            }
+
+            const isActive =
+              pathname === href || pathname.startsWith(`${href}/`);
+
+            return (
+              <li key={item}>
+                <Link
+                  href={href}
+                  className={`block px-4 py-3 rounded-xl text-sm font-medium transition ${
+                    isActive
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "text-slate-200 hover:bg-slate-800 hover:text-white"
+                  }`}
+                >
+                  {item}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </aside>

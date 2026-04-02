@@ -1,78 +1,142 @@
 import {
-    Controller,
-    Get,
-    Post,
-    Put,
-    Body,
-    Param,
-    UseGuards,
-    Query,
-} from '@nestjs/common';
-import { UserService } from 'src/user/user.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import { Role } from '@prisma/client';
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+  Patch,
+} from "@nestjs/common";
+import { UserService } from "src/user/user.service";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
+import { RolesGuard } from "src/auth/guards/roles.guard";
+import { Roles } from "src/auth/decorators/roles.decorator";
+import { CurrentUser } from "src/auth/decorators/current-user.decorator";
+import { Role } from "@prisma/client";
 
-@Controller('users')
+@Controller("users")
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
-    constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
-    @Get()
-    @Roles('OWNER', 'MOTHER', 'WHITELABEL', 'SUPERADMIN', 'ADMIN', 'B2C_SUBADMIN', 'B2B_SUBADMIN')
-    async findAll(
-        @CurrentUser() user: any,
-        @Query('page') page?: number,
-        @Query('limit') limit?: number,
-    ) {
-        return this.userService.findAll(user.role, user.tenantId, Number(page || 1), Number(limit || 10));
-    }
+  @Get()
+  @Roles(
+    "OWNER",
+    "MOTHER",
+    "WHITELABEL",
+    "SUPERADMIN",
+    "ADMIN",
+    "B2C_SUBADMIN",
+    "B2B_SUBADMIN",
+  )
+  async findAll(
+    @CurrentUser() user: any,
+    @Query("page") page?: number,
+    @Query("limit") limit?: number,
+  ) {
+    return this.userService.findAll(
+      user.role,
+      user.tenantId,
+      Number(page || 1),
+      Number(limit || 10),
+    );
+  }
 
-    @Get(':id')
-    async findOne(@Param('id') id: string, @CurrentUser() user: any) {
-        return this.userService.findOne(id, user.id, user.role);
-    }
+  @Get(":id")
+  async findOne(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.userService.findOne(id, user.id, user.role);
+  }
 
-    @Get(':id/downline')
-    async getDownline(@Param('id') id: string, @CurrentUser() user: any) {
-        return this.userService.getDownlineTree(id, user.id, user.role);
-    }
+  @Get(":id/downline")
+  async getDownline(@Param("id") id: string, @CurrentUser() user: any) {
+    return this.userService.getDownlineTree(id, user.id, user.role);
+  }
 
-    @Post()
-    @Roles('OWNER', 'MOTHER', 'WHITELABEL', 'SUPERADMIN', 'ADMIN', 'AGENT', 'MASTER_AGENT', 'SUPER_AGENT')
-    async createUser(
-        @Body() createUserDto: {
-            username: string;
-            password: string;
-            role: Role;
-            parentId?: string;
-        },
-        @CurrentUser() user: any,
-    ) {
-        return this.userService.createUser(
-            createUserDto.username,
-            createUserDto.password,
-            createUserDto.role,
-            createUserDto.parentId || user.id,
-            user.role,
-            user.tenantId,
-        );
-    }
+  @Post()
+  @Roles(
+    "OWNER",
+    "MOTHER",
+    "WHITELABEL",
+    "SUPERADMIN",
+    "ADMIN",
+    "AGENT",
+    "MASTER_AGENT",
+    "SUPER_AGENT",
+  )
+  async createUser(
+    @Body()
+    createUserDto: {
+      username: string;
+      password: string;
+      role: Role;
+      parentId?: string;
+    },
+    @CurrentUser() user: any,
+  ) {
+    return this.userService.createUser(
+      createUserDto.username,
+      createUserDto.password,
+      createUserDto.role,
+      createUserDto.parentId || user.id,
+      user.role,
+      user.tenantId,
+    );
+  }
 
-    @Put(':id/balance')
-    @Roles('OWNER', 'MOTHER', 'WHITELABEL', 'SUPERADMIN', 'ADMIN', 'AGENT', 'MASTER_AGENT', 'SUPER_AGENT')
-    async updateBalance(
-        @Param('id') id: string,
-        @Body() updateBalanceDto: { amount: number },
-        @CurrentUser() user: any,
-    ) {
-        return this.userService.updateBalance(
-            id,
-            updateBalanceDto.amount,
-            user.id,
-            user.role,
-        );
-    }
+  @Put(":id/balance")
+  @Roles(
+    "OWNER",
+    "MOTHER",
+    "WHITELABEL",
+    "SUPERADMIN",
+    "ADMIN",
+    "AGENT",
+    "MASTER_AGENT",
+    "SUPER_AGENT",
+  )
+  async updateBalance(
+    @Param("id") id: string,
+    @Body() updateBalanceDto: { amount: number },
+    @CurrentUser() user: any,
+  ) {
+    return this.userService.updateBalance(
+      id,
+      updateBalanceDto.amount,
+      user.id,
+      user.role,
+    );
+  }
 }
+
+///////////////////
+
+// @Controller('users')
+// export class UsersController {
+
+//   @Get()
+//   getUsers() {
+//     return { message: "All users list" };
+//   }
+
+//   @Get('search')
+//   search(@Query('q') q: string) {
+//     return { message: "Search result", query: q };
+//   }
+
+//   @Patch(':id/block')
+//   blockUser(@Param('id') id: string) {
+//     return { message: User ${id} blocked };
+//   }
+
+//   @Get('inactive')
+//   inactiveUsers() {
+//     return { message: "Inactive users" };
+//   }
+
+//   @Get('deleted')
+//   deletedUsers() {
+//     return { message: "Deleted users" };
+//   }
+// }
