@@ -1,4 +1,9 @@
 # Logs
+frontend/.next/
+frontend/node_modules/
+server/dist/
+*.tsbuildinfo
+
 logs
 *.log
 npm-debug.log*
